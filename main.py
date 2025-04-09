@@ -22,7 +22,7 @@ async def get(ctx):
         if today in i[0][1:]:
             idx = 1
             while True:
-                if today in i[0][idx]:
+                if today == i[0][idx].split("日")[0]:
                     break
                 idx += 1
             msg = f"今日の日替わりメニュー\n"
