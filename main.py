@@ -26,7 +26,7 @@ async def week(ctx):
 def make_message(week=False):
     with open(sys.argv[1], "r", encoding="utf-8") as f:
         info = eval(f.read())
-    today =  "4" or str(datetime.datetime.now().day)
+    today =  str(datetime.datetime.now().day)
     for i in info:
         for n, d in enumerate(i[0][1:]):
             if today == d.split("日")[0].strip():
