@@ -53,10 +53,10 @@ def make_message(day=today, week=False):
             continue
         if week:
             msg = ""
-            for n in range(len(i)-1):
-                msg += f"{i[0][n+1]}のメニュー\n"
-                for m in range(len(i[0])-1):
-                    msg += "{}: {}\n".format(i[m+1][0], i[m+1][n+1].replace("\n", ", "))
+            for n in range(1, len(i)):
+                msg += f"{i[0][n]}のメニュー\n"
+                for m in range(1, len(i[0])):
+                    msg += "{}: {}\n".format(i[m][0], i[m][n].replace("\n", ", "))
                 msg += "\n"
             return msg
                 
