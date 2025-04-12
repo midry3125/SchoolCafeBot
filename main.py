@@ -16,21 +16,33 @@ async def on_ready():
 
 @bot.command()
 async def today(ctx):
-    msg = make_message()
+    msg = make_today_message()
     await ctx.send(msg)
 
 @bot.command()
 async def week(ctx):
-    msg = make_message(True)
+    msg = make_week_message()
     await ctx.send(msg)
 
-def make_message(week=False):
+@bot.command()
+async def day(ctx, d):
+    msg = make_message(d)
+    await ctx.send(msg)
+
+def make_today_message():
+    return make_message()
+
+def make_week_meaage():
+    return make_message(week=True)
+
+def make_message(day=None, week=False):
     with open(sys.argv[1], "r", encoding="utf-8") as f:
         info = json.load(f)
-    today =  str(datetime.datetime.now().day)
+    if day is None:
+        day = str(datetime.datetime.now().day)
     for i in info:
         for n, d in enumerate(i[0][1:]):
-            if today == d.split("日")[0].strip():
+            if day == d.split("日")[0].strip():
                 idx = n + 1
                 break
         else:
@@ -49,7 +61,7 @@ def make_message(week=False):
             for m in i[1:]:
                 msg += "{}: {}\n".format(m[0], m[idx].replace("\n", ", "))
             return msg
-    return "まだ情報がありません"
+    return "情報がありません"
 
 def main():
     TOKEN = os.environ["DISCORD_API_KEY"] # APIキー
