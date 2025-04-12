@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import sys
 
@@ -25,7 +26,7 @@ async def week(ctx):
 
 def make_message(week=False):
     with open(sys.argv[1], "r", encoding="utf-8") as f:
-        info = eval(f.read())
+        info = json.load(f)
     today =  str(datetime.datetime.now().day)
     for i in info:
         for n, d in enumerate(i[0][1:]):
