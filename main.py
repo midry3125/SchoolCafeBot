@@ -9,7 +9,7 @@ from discord.ext import commands
 intents = discord.Intents.all()
 intents.message_content = True
 bot = commands.Bot(intents=intents, command_prefix="!")
-today = datetime.datetime.now().day
+now = datetime.datetime.now()
 
 @bot.event
 async def on_ready():
@@ -22,7 +22,8 @@ async def today(ctx):
 
 @bot.command()
 async def tommorrow(ctx):
-    msg = make_message(today + 1)
+    t = now + datetime.timedelta(days = 1)
+    msg = make_message(t.day)
     await ctx.send(msg)
 
 @bot.command()
@@ -41,7 +42,7 @@ def make_today_message():
 def make_week_meaage():
     return make_message(week=True)
 
-def make_message(day=today, week=False):
+def make_message(day=now.day, week=False):
     with open(sys.argv[1], "r", encoding="utf-8") as f:
         info = json.load(f)
     for i in info:
@@ -61,7 +62,7 @@ def make_message(day=today, week=False):
             return msg
                 
         else:
-            msg = f"今日の日替わりメニュー\n"
+            msg = "{}の日替わりメニュー\n".format("今日" if day == today else f"{day}日")
             for m in i[1:]:
                 msg += "{}: {}\n".format(m[0], m[idx].replace("\n", ", "))
             return msg
