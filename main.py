@@ -8,12 +8,22 @@ from discord.ext import commands
 
 intents = discord.Intents.all()
 intents.message_content = True
+intents.reactions = True
 bot = commands.Bot(intents=intents, command_prefix="!")
 now = datetime.datetime.now()
+
+selections = {
+    "→": ,
+    "今週": 
+}
 
 @bot.event
 async def on_ready():
     pass
+
+@bot.event
+async def on_raw_reaction_add(payload):
+
 
 @bot.command()
 async def today(ctx):
@@ -35,6 +45,10 @@ async def week(ctx):
 async def day(ctx, d: int):
     msg = make_message(d)
     await ctx.send(msg)
+
+def make_selections(msg):
+    for k, v in selections.items():
+        await msg.add_reaction(k)
 
 def make_today_message():
     return make_message()
