@@ -1,20 +1,17 @@
 import datetime
-import ctypes
-import json
 import os
 import sys
 
 import discord
 from discord.ext import commands, tasks
 
+import menu_scraper
+
 intents = discord.Intents.all()
 intents.message_content = True
 intents.reactions = True
 bot = commands.Bot(intents=intents, command_prefix="!")
 now = datetime.datetime.now()
-
-get_info = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(sys.argv[0]), "GetInfo.so")).get_info
-get_info.restype = ctypes.c_char_p
 
 def update_date():
     global now
@@ -65,7 +62,7 @@ def make_week_message():
     return make_message(week=True)
 
 def make_message(day=now.day, week=False):
-    info = json.loads(get_info())
+    info = menu_scraper.get_menu_tables()
     day = str(day)
     for i in info:
         for n, d in enumerate(i[0][1:]):
