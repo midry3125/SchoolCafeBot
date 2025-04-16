@@ -1,10 +1,11 @@
 import datetime
+import ctypes
 import json
 import os
 import sys
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 intents = discord.Intents.all()
 intents.message_content = True
@@ -12,53 +13,60 @@ intents.reactions = True
 bot = commands.Bot(intents=intents, command_prefix="!")
 now = datetime.datetime.now()
 
-selections = {
-    "→": ,
-    "今週": 
-}
+get_info = ctypes.cdll.LoadLibrary(os.path.join(os.path.dirname(sys.argv[0]), "GetInfo.so")).get_info
+get_info.restype = ctypes.c_char_p
+
+def update_date():
+    global now
+    now = datetime.datetime.now()
+
+@tasks.loop(seconds=60)
+async def schedule():
+    await bot.wait_until_ready()
+    if datetime.datetime.now().day != now.day:
+        update_date()
+        msg = make_today_message()
+        chan = bot.get_channel(CHANNEL)
+        await chan.send(msg)
 
 @bot.event
 async def on_ready():
     pass
 
-@bot.event
-async def on_raw_reaction_add(payload):
-
-
 @bot.command()
 async def today(ctx):
+    update_date()
     msg = make_today_message()
     await ctx.send(msg)
 
 @bot.command()
-async def tommorrow(ctx):
+async def tomorrow(ctx):
+    update_date()
     t = now + datetime.timedelta(days = 1)
     msg = make_message(t.day)
     await ctx.send(msg)
 
 @bot.command()
 async def week(ctx):
+    update_date()
     msg = make_week_message()
     await ctx.send(msg)
 
 @bot.command()
 async def day(ctx, d: int):
+    update_date()
     msg = make_message(d)
     await ctx.send(msg)
-
-def make_selections(msg):
-    for k, v in selections.items():
-        await msg.add_reaction(k)
 
 def make_today_message():
     return make_message()
 
-def make_week_meaage():
+def make_week_message():
     return make_message(week=True)
 
 def make_message(day=now.day, week=False):
-    with open(sys.argv[1], "r", encoding="utf-8") as f:
-        info = json.load(f)
+    info = json.loads(get_info())
+    day = str(day)
     for i in info:
         for n, d in enumerate(i[0][1:]):
             if day == d.split("日")[0].strip():
@@ -83,7 +91,9 @@ def make_message(day=now.day, week=False):
     return "情報がありません"
 
 def main():
+    global CHANNEL
     TOKEN = os.environ["DISCORD_API_KEY"] # APIキー
+    CHANNEL = os.environ["DISCORD_CHANNEL_ID"]
     bot.run(TOKEN)
 
 if __name__ == "__main__":
